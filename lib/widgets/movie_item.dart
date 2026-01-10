@@ -10,9 +10,16 @@ class MovieItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 100,
+        //height: 100,
         color: Colors.deepPurple,
-        child: Text(movie.name),
+        child: movie.posterPath != null
+            ? Image.network(
+                'https://image.tmdb.org/t/p/w500' + movie.posterPath,
+                fit: BoxFit.cover,
+              )
+            : const Text('No Image Available', style: TextStyle(color: Colors.white),
+        ),
+
       ),
     );
   }
