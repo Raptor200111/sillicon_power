@@ -1,5 +1,6 @@
+import '../../domain/entities/tv_show.dart';
 
-class Movie {
+class TmdbTVShowModel {
   final int id;
   final String name;
   final String overview;
@@ -14,7 +15,7 @@ class Movie {
   final String originalLanguage;
   final String originalName;
 
-  Movie({
+  const TmdbTVShowModel({
     required this.id,
     required this.name,
     required this.overview,
@@ -30,8 +31,8 @@ class Movie {
     required this.originalName,
   });
 
-  factory Movie.fromJson(Map<String, dynamic> json) {
-    return Movie(
+  factory TmdbTVShowModel.fromJson(Map<String, dynamic> json) {
+    return TmdbTVShowModel(
       id: json['id'],
       name: json['name'],
       overview: json['overview'] ?? '',
@@ -45,6 +46,25 @@ class Movie {
       originCountry: List<String>.from(json['origin_country']),
       originalLanguage: json['original_language'],
       originalName: json['original_name'],
+    );
+  }
+
+  // Convert to domain entity
+  TVShow toEntity() {
+    return TVShow(
+      id: id,
+      name: name,
+      overview: overview,
+      posterPath: posterPath,
+      backdropPath: backdropPath,
+      firstAirDate: firstAirDate,
+      voteAverage: voteAverage,
+      voteCount: voteCount,
+      popularity: popularity,
+      genreIds: genreIds,
+      originCountry: originCountry,
+      originalLanguage: originalLanguage,
+      originalName: originalName,
     );
   }
 }

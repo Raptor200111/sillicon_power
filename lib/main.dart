@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'widgets/homepage.dart';
+import 'presentation/pages/homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/di/service_locator.dart';
 
 Future<void> main() async {
   await dotenv.load();
+  setupDependencies();
   runApp(MyApp());
 }
 
