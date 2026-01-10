@@ -1,7 +1,6 @@
 import '../../domain/entities/tv_show.dart';
 import '../../domain/repositories/tv_show_repository.dart';
 import '../datasources/tmdb_datasource.dart';
-import '../models/tmdb_tv_show_model.dart';
 
 class TVShowRepositoryImpl implements TVShowRepository {
   final TmdbDatasource tmdbDatasource;
