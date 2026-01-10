@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../models/movie.dart';
 
 class MovieItem extends StatelessWidget {
-  final String title;
+  final Movie movie;
 
-  const MovieItem({super.key, required this.title});
+  const MovieItem({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,7 @@ class MovieItem extends StatelessWidget {
       child: Container(
         height: 100,
         color: Colors.deepPurple,
-        child: Text(title),
+        child: Text(movie.name),
       ),
     );
   }
