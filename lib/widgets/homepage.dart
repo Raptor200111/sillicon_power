@@ -37,7 +37,11 @@ class _HomePageState extends State<HomePage> {
               return const Text('No popular TV shows found.');
             } else {
               final movies = snapshot.data!;
-              return ListView.builder(
+              return GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 0.7,
+                ),
                 itemCount: movies.length,
                 itemBuilder: (context, index) {
                   return MovieItem(movie: movies[index]);
