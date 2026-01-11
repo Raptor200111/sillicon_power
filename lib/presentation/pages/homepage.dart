@@ -43,21 +43,23 @@ class _HomePageState extends State<HomePage> {
 
   void _goToPreviousPage(BuildContext context) {
     if (_currentPageIndex > 0) {
+      _currentPageIndex--;
       _pageController.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-      context.read<PopularTVBloc>().add(LoadPopularTVShows(--_currentPageIndex));
+      context.read<PopularTVBloc>().add(LoadPopularTVShows(_currentPageIndex + 1));
     }
   }
 
   void _goToNextPage(BuildContext context, int totalPages) {
     if (_currentPageIndex < totalPages - 1) {
+      _currentPageIndex++;
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-      context.read<PopularTVBloc>().add(LoadPopularTVShows(++_currentPageIndex));
+      context.read<PopularTVBloc>().add(LoadPopularTVShows(_currentPageIndex + 1));
     }
   }
 
