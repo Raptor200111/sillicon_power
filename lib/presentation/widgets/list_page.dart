@@ -13,7 +13,12 @@ class ListPage extends StatelessWidget {
     return ListView.builder(
       itemCount: tvShows.length,
       itemBuilder: (context, index) {
-        return TVShowItem(tvShow: tvShows[index]);
+        return TVShowItem(
+          tvShow: tvShows[index],
+          onTap: () {
+            print('${tvShows[index].name}');
+          },
+        );
       },
     );
   }
