@@ -8,10 +8,9 @@ abstract class TvShowGenreEvent extends Equatable {
 }
 
 class LoadTvShowGenre extends TvShowGenreEvent {
-  final int page;
 
-  const LoadTvShowGenre(this.page);
+  const LoadTvShowGenre();
 
   @override
-  List<Object> get props => [page];
+  List<Object> get props => [];
 }
