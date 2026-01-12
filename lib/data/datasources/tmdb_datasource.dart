@@ -39,4 +39,20 @@ class TmdbDatasource {
       throw Exception('Failed to load total pages');
     }
   }
+
+  Future<Map<int, String>> fetchTvShowGenreMap() async {
+    final response = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/genre/tv/list?api_key=$tmdbApiKey'));
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      final List genres = decoded['genres'];
+
+      return {
+        for (var genre in genres) genre['id'] as int: genre['name'] as String
+      };
+    } else {
+      throw Exception('Failed to load genres');
+    }
+  }
 }
