@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sillicon_power/presentation/widgets/rating_widget.dart';
 import '../../domain/entities/tv_show.dart';
 
 class TVShowItem extends StatelessWidget {
@@ -51,17 +52,7 @@ class TVShowItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   
-                  Row(
-                    children: [
-                      Container(
-                        child: const Icon(Icons.star, size: 16, color: Colors.orange),
-                        ),
-                        Text(tvShow.voteAverage.toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 14)),
-                        Text(' (' + tvShow.voteCount.toString() + (tvShow.voteCount == 1 ? ' vote)' : ' votes)'),
-                            style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                    ],
-                  ),
+                  RatingWidget(tvShow: tvShow),
                   
                   const Expanded(child: SizedBox(height: 8)),
                   

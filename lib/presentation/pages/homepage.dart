@@ -73,6 +73,12 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.more_horiz),
+              onPressed: () => print('More options'),//ToDo: implement config_page
+            ),
+          ],
         ),
         body: BlocBuilder<PopularTVBloc, PopularTVState>(
           builder: (context, state) {
