@@ -1,53 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sillicon_power/domain/entities/tv_show.dart';
-import 'package:sillicon_power/presentation/bloc/tv_show_genre/tv_show_genre_bloc.dart';
-import 'package:sillicon_power/presentation/bloc/tv_show_genre/tv_show_genre_event.dart';
-import 'package:sillicon_power/presentation/bloc/tv_show_genre/tv_show_genre_state.dart';
 import 'package:sillicon_power/presentation/widgets/genre_grid_widget.dart';
-import '../../core/di/service_locator.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 import '../widgets/rating_widget.dart';
 
-class TvShowPage extends StatefulWidget {
-  const TvShowPage({super.key, required this.tvShow});
+class TvShowPage extends StatelessWidget {
+  const TvShowPage({super.key, required this.tvShow, required this.genres});
   final TVShow tvShow;
-
-  @override
-  State<TvShowPage> createState() => _TvShowPageState();
-}
-
-class _TvShowPageState extends State<TvShowPage> {
-  Color _arrowColor = Colors.white;
-
-  @override
-  void initState() {
-    super.initState();
-    _updateArrowColor();
-  }
-
-  Future<void> _updateArrowColor() async {
-    if (widget.tvShow.backdropPath.isNotEmpty) {
-      try {
-        final imageProvider = NetworkImage(
-          'https://image.tmdb.org/t/p/w500${widget.tvShow.backdropPath}',
-        );
-        final paletteGenerator = await PaletteGenerator.fromImageProvider(imageProvider);
-        
-        final dominantColor = paletteGenerator.dominantColor?.color ?? Colors.grey;
-        final brightness = ThemeData.estimateBrightnessForColor(dominantColor);
-        
-        setState(() {
-          _arrowColor = brightness == Brightness.light ? Colors.black : Colors.white;
-        });
-      } catch (e) {
-        setState(() {
-          _arrowColor = Colors.white;
-        });
-      }
-    }
-  }
+  final Map<int, String> genres;
 
   @override
   Widget build(BuildContext context) {
@@ -56,39 +16,27 @@ class _TvShowPageState extends State<TvShowPage> {
     
     final widgetWidth = screenWidth * 0.9;
 
-    return BlocProvider(
-      create: (_) => getIt<TvShowGenreBloc>()
-        ..add(const LoadTvShowGenre()),
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: _arrowColor),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
-        body: BlocBuilder<TvShowGenreBloc, TvShowGenreState>(
-          builder: (context, state) {
-            if (state is TvShowGenreLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is TvShowGenreError) {
-              return Center(child: Text('Error: ${state.message}'));
-            } else if (state is TvShowGenreLoaded) {
-              state.genres; // You can use this map if needed
-              return SingleChildScrollView(
-                child: Column(
+        body: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
                         ClipRRect(
-                          child: widget.tvShow.backdropPath.isNotEmpty
+                          child: tvShow.backdropPath.isNotEmpty
                               ? Image.network(
-                                  'https://image.tmdb.org/t/p/w500${widget.tvShow.backdropPath}',
+                                  'https://image.tmdb.org/t/p/w500${tvShow.backdropPath}',
                                   fit: BoxFit.cover,
                                   width: screenWidth,
                                   //height: 200,
@@ -116,9 +64,9 @@ class _TvShowPageState extends State<TvShowPage> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: widget.tvShow.posterPath.isNotEmpty
+                              child: tvShow.posterPath.isNotEmpty
                                   ? Image.network(
-                                      'https://image.tmdb.org/t/p/w200${widget.tvShow.posterPath}',
+                                      'https://image.tmdb.org/t/p/w200${tvShow.posterPath}',
                                       width: screenWidth * 0.4,
                                       fit: BoxFit.cover,
                                       //height: 260,
@@ -141,44 +89,38 @@ class _TvShowPageState extends State<TvShowPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            widget.tvShow.name,
+                            tvShow.name,
                             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
-                          RatingWidget(tvShow: widget.tvShow),
+                          RatingWidget(tvShow: tvShow),
                           const SizedBox(height: 8),
                           Text(
-                            "Popularity: ${widget.tvShow.popularity.toStringAsFixed(1)}",
+                            "Popularity: ${tvShow.popularity.toStringAsFixed(1)}",
                             style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "First Air Date: ${widget.tvShow.firstAirDate}",
+                            "First Air Date: ${tvShow.firstAirDate}",
                             style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.10),
-                    GenreGridWidget(tvShow: widget.tvShow, genres: state.genres),
+                    GenreGridWidget(tvShow: tvShow, genres: genres),
                     Padding(padding:  EdgeInsets.all(screenWidth * 0.05),
                       child: Text(
-                        widget.tvShow.overview,
+                        tvShow.overview,
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
-                    Text("Origin Language: ${widget.tvShow.originalLanguage}", textAlign: TextAlign.left),
-                    Text("Original Name: ${widget.tvShow.originalName}", textAlign: TextAlign.left),
-                    Text("Origin Country: ${widget.tvShow.originCountry.join(', ')}", textAlign: TextAlign.left),
-                    
-                  ],
-                ),
-              );
-            }
-            return const Center(child: Text('No data'));
-          },
-        ),
-      ),
-    );
+                      Text("Origin Language: ${tvShow.originalLanguage}", textAlign: TextAlign.left),
+                      Text("Original Name: ${tvShow.originalName}", textAlign: TextAlign.left),
+                      Text("Origin Country: ${tvShow.originCountry.join(', ')}", textAlign: TextAlign.left),
+                      
+                    ],
+                  ),
+        );
+    }
   }
-}

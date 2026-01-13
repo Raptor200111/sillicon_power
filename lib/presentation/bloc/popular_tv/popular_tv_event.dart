@@ -16,6 +16,6 @@ class LoadPopularTVShows extends PopularTVEvent {
   List<Object> get props => [page];
 }
 
-class LoadTotalPages extends PopularTVEvent {
-  const LoadTotalPages();
+class LoadTvShowInfo extends PopularTVEvent {
+  const LoadTvShowInfo();
 }

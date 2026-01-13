@@ -6,7 +6,6 @@ import '../../domain/usecases/fetch_popular_tv_shows.dart';
 import '../../domain/usecases/fetch_total_pages.dart';
 import '../../domain/usecases/fetch_tv_show_genre_map.dart';
 import '../../presentation/bloc/popular_tv/popular_tv_bloc.dart';
-import '../../presentation/bloc/tv_show_genre/tv_show_genre_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -28,9 +27,6 @@ void setupDependencies() {
   getIt.registerFactory(() => PopularTVBloc(
         fetchPopularTVShows: getIt<FetchPopularTVShows>(),
         fetchTotalPages: getIt<FetchTotalPages>(),
-      ));
-      
-  getIt.registerFactory(() => TvShowGenreBloc(
         fetchTvShowGenreMap: getIt<FetchTvShowGenreMap>(),
       ));
 }
