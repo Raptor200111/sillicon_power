@@ -66,21 +66,42 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              SliverToBoxAdapter(
-                child: BlocBuilder<PopularTVBloc, PopularTVState>(
-                  builder: (context, state) {
-                    if (state is PopularTVLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is PopularTVError) {
-                      return Center(child: Text('Error: ${state.message}'));
-                    } else if (state is PopularTVLoaded) {
-                      int realTotalPages = state.totalPages > 500 ? 500 : state.totalPages;
-                      return ListPageWidget(genres: state.genreMap, page: _currentPageIndex + 1, tvShows: state.tvShows, totalPages: realTotalPages, onPreviousPage: () => _goToPreviousPage(context), onNextPage: () => _goToNextPage(context, realTotalPages),);
-                      }
-                    return const Center(child: Text('No data'));
-                  },
-                ),
-              )
+              BlocBuilder<PopularTVBloc, PopularTVState>(
+                builder: (context, state) {
+                  if (state is PopularTVLoading) {
+                    return const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: CircularProgressIndicator(color: Colors.black,),
+                      ),
+                    );
+                  }
+
+                  if (state is PopularTVError) {
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Text('Something went wrong'),
+                      ),
+                    );
+                  }
+
+                  if (state is PopularTVLoaded) {
+                    int realTotalPages = state.totalPages > 500 ? 500 : state.totalPages;
+                    return SliverToBoxAdapter(
+                      child: ListPageWidget(genres: state.genreMap, page: _currentPageIndex + 1, tvShows: state.tvShows, totalPages: realTotalPages, onPreviousPage: () => _goToPreviousPage(context), onNextPage: () => _goToNextPage(context, realTotalPages),)
+                    );
+                  }
+
+                  return SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: Text('No data')),
+                  );
+                },
+              ),
+
+
+              
             ],
           ) 
         ),
