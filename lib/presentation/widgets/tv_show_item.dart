@@ -11,28 +11,30 @@ class TVShowItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final widgetWidth = screenWidth * 0.9;
     
     return Container(
       width: widgetWidth,
-      height: 200,
+      height: screenHeight * 0.255,
       margin: EdgeInsets.symmetric(
         horizontal: (screenWidth - widgetWidth) / 2,
-        vertical: 8,
+        vertical: (screenWidth - widgetWidth) / 4,
       ),
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: tvShow.posterPath.isNotEmpty
-                ? Image.network(
-                    'https://image.tmdb.org/t/p/w200${tvShow.posterPath}',
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    color: Colors.grey[300],
-                    child: Icon(Icons.tv, size: widgetWidth * 0.1),
-                  ),
+            child: Image.network(
+              'https://image.tmdb.org/t/p/w200${tvShow.posterPath}',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: screenHeight * 0.255,
+                width: widgetWidth * 0.35,
+                color: Theme.of(context).colorScheme.inversePrimary,
+                child: Icon(Icons.tv, size: widgetWidth * 0.1),
+              ),
+            )
           ),
           // Title, Overview, and Button on the right
           Expanded(
@@ -44,10 +46,7 @@ class TVShowItem extends StatelessWidget {
                 children: [
                   Text(
                     tvShow.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.headlineMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -58,12 +57,10 @@ class TVShowItem extends StatelessWidget {
                   
                   Row(children: [
                     Text(tvShow.firstAirDate,
-                        style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                    
+                        style: Theme.of(context).textTheme.bodyMedium),
                     const Expanded(child: SizedBox(height: 8)),
 
                     SizedBox(
-                      //width: 100,
                       child: ElevatedButton(
                         onPressed: onTap,
                         style: ElevatedButton.styleFrom(

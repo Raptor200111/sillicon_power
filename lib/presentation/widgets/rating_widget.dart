@@ -11,12 +11,12 @@ class RatingWidget extends StatelessWidget {
     return Row(
       children: [
         Container(
-          child: const Icon(Icons.star, size: 16, color: Colors.orange),
+          child: Icon(Icons.star, size: 16, color: Theme.of(context).colorScheme.tertiary),
           ),
           Text(tvShow.voteAverage.toStringAsFixed(1),
-              style: const TextStyle(fontSize: 14)),
+              style: Theme.of(context).textTheme.bodyMedium),
           Text(' (${tvShow.voteCount}${tvShow.voteCount == 1 ? ' vote)' : ' votes)'}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey)),
+              style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }

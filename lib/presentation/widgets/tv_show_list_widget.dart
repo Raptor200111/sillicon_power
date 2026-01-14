@@ -47,14 +47,14 @@ class ListPageWidget extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: onPreviousPage,
-                child: const Text('<'),
+                child: Text('<', style: Theme.of(context).textTheme.titleLarge),
               ),
               const SizedBox(width: 16),
-              Text('Page $page of ${totalPages > 500 ? '500' : '$totalPages'}'),
+              Text('Page $page of ${totalPages > 500 ? '500' : '$totalPages'}', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(width: 16),
               ElevatedButton(
                 onPressed: onNextPage,
-                child: const Text('>'),
+                child: Text('>', style: Theme.of(context).textTheme.titleLarge),
               ),
             ],
           ),

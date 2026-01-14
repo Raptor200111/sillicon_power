@@ -16,12 +16,12 @@ class GenreGridWidget extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.blueGrey,
+              color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               genres[genre] ?? 'Unknown',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
       ],

@@ -43,9 +43,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      
-      home: BlocProvider(
+    return BlocProvider(
         create: (_) => getIt<PopularTVBloc>()
           ..add(const LoadTvShowInfo())
           ..add(const LoadPopularTVShows(1)),
@@ -54,15 +52,17 @@ class _HomePageState extends State<HomePage> {
             slivers: [
               SliverAppBar(
                 //pinned: true,
+                floating: true,
                 expandedHeight: 0,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: Container(color: Theme.of(context).colorScheme.inversePrimary),
-                  title: Text(widget.title),
+                  background: Container(color: Theme.of(context).colorScheme.secondary),
+                  title: Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
                 ),
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.more_horiz),
-                    onPressed: () => print('More options'), //ToDo: implement config_page
+                    onPressed: () => {},
+                    //onPressed: () => print('More options'), //ToDo: implement config_page
                   ),
                 ],
               ),
@@ -74,7 +74,8 @@ class _HomePageState extends State<HomePage> {
                     } else if (state is PopularTVError) {
                       return Center(child: Text('Error: ${state.message}'));
                     } else if (state is PopularTVLoaded) {
-                      return ListPageWidget(genres: state.genreMap, page: _currentPageIndex + 1, tvShows: state.tvShows, totalPages: state.totalPages, onPreviousPage: () => _goToPreviousPage(context), onNextPage: () => _goToNextPage(context, state.totalPages),);
+                      int realTotalPages = state.totalPages > 500 ? 500 : state.totalPages;
+                      return ListPageWidget(genres: state.genreMap, page: _currentPageIndex + 1, tvShows: state.tvShows, totalPages: realTotalPages, onPreviousPage: () => _goToPreviousPage(context), onNextPage: () => _goToNextPage(context, realTotalPages),);
                       }
                     return const Center(child: Text('No data'));
                   },
@@ -83,7 +84,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ) 
         ),
-      )
-    );
+      );
   }
 }
