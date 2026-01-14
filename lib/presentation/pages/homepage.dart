@@ -37,8 +37,8 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Widget buildPage(int index, List<TVShow> tvShows) {
-    return ListPage(page: index + 1, tvShows: tvShows);
+  Widget buildPage(int index, List<TVShow> tvShows, Map<int, String> genres) {
+    return ListPage(page: index + 1, tvShows: tvShows, genres: genres); // Pass genres map here
   }
 
   void _goToPreviousPage(BuildContext context) {
@@ -67,12 +67,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<PopularTVBloc>()
-        ..add(const LoadTotalPages())
+        ..add(const LoadTvShowInfo())
         ..add(const LoadPopularTVShows(1)),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.more_horiz),
+              onPressed: () => print('More options'),//ToDo: implement config_page
+            ),
+          ],
         ),
         body: BlocBuilder<PopularTVBloc, PopularTVState>(
           builder: (context, state) {
@@ -87,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                     child: PageView.builder(
                       controller: _pageController,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) => buildPage(index, state.tvShows),
+                      itemBuilder: (context, index) => buildPage(index, state.tvShows, state.genreMap),
                       itemCount: state.totalPages,
                     ),
                   ),

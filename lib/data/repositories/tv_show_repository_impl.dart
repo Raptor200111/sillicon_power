@@ -15,4 +15,8 @@ class TVShowRepositoryImpl implements TVShowRepository {
 
   @override
   Future<int> fetchTotalPages() => tmdbDatasource.fetchTotalPages();
+
+  @override
+  Future<Map<int, String>> fetchTvShowGenreMap() =>
+      tmdbDatasource.fetchTvShowGenreMap();
 }

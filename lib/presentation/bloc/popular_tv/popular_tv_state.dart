@@ -15,11 +15,12 @@ class PopularTVLoading extends PopularTVState {}
 class PopularTVLoaded extends PopularTVState {
   final List<TVShow> tvShows;
   final int totalPages;
+  final Map<int, String> genreMap;
 
-  const PopularTVLoaded(this.tvShows, this.totalPages);
+  const PopularTVLoaded(this.tvShows, this.totalPages, this.genreMap);
 
   @override
-  List<Object> get props => [tvShows, totalPages];
+  List<Object> get props => [tvShows, totalPages, genreMap];
 }
 
 class PopularTVError extends PopularTVState {
