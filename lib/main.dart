@@ -9,6 +9,7 @@ import 'package:sillicon_power/presentation/theme/theme_provider.dart';
 import 'presentation/pages/homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/di/service_locator.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,11 +38,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = context.watch<LanguageProvider>();
+    
     return MaterialApp(
       title: 'Sillicon Power Inc.',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode. system,
+      themeMode: ThemeMode.system,
+      // Add localization configuration
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale(languageProvider.currentLanguage),
       home: const HomePage(title: 'Sillicon Power Inc.'),
     );
   }
