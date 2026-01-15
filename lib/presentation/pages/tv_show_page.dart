@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sillicon_power/domain/entities/tv_show.dart';
 import 'package:sillicon_power/presentation/widgets/genre_grid_widget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/rating_widget.dart';
 
@@ -83,12 +84,12 @@ class TvShowPage extends StatelessWidget {
                                 RatingWidget(tvShow: tvShow),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "Popularity: ${tvShow.popularity.toStringAsFixed(1)}",
+                                  "${AppLocalizations.of(context)!.popularity}: ${tvShow.popularity.toStringAsFixed(1)}",
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "First Air Date: ${tvShow.firstAirDate}",
+                                  "${AppLocalizations.of(context)!.firstAirDate}: ${tvShow.firstAirDate}",
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                               ],
@@ -112,9 +113,9 @@ class TvShowPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Original Name: ${tvShow.originalName}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
-                                Text("Origin Language: ${tvShow.originalLanguage}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
-                                Text("Origin Country: ${tvShow.originCountry.join(', ')}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
+                                Text("${AppLocalizations.of(context)!.originalName}: ${tvShow.originalName}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
+                                Text("${AppLocalizations.of(context)!.originalLanguage}: ${tvShow.originalLanguage}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
+                                Text("${AppLocalizations.of(context)!.originCountry}: ${tvShow.originCountry.join(', ')}", maxLines: null, overflow: TextOverflow.clip, style: Theme.of(context).textTheme.bodyMedium),
                                 //Text("Original Name: ${tvShow.originalName}\nOrigin Language: ${tvShow.originalLanguage}", maxLines: null, overflow: TextOverflow.clip)
                               ],
                             ),

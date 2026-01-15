@@ -25,14 +25,14 @@ class PopularTVBloc extends Bloc<PopularTVEvent, PopularTVState> {
   ) async {
     emit(PopularTVLoading());
     try {
-      final tvShows = await fetchPopularTVShows(event.page);
+      final tvShows = await fetchPopularTVShows(event.page, event.languageCode);
       // Assume totalPages is already loaded; in a real app, cache it
       final totalPages = state is PopularTVLoaded
           ? (state as PopularTVLoaded).totalPages
           : await fetchTotalPages();
       final genreMap = state is PopularTVLoaded
           ? (state as PopularTVLoaded).genreMap
-          : await fetchTvShowGenreMap();
+          : await fetchTvShowGenreMap(event.languageCode);
       emit(PopularTVLoaded(tvShows, totalPages, genreMap)); // Empty genreMap for now
     } catch (e) {
       emit(PopularTVError(e.toString()));
@@ -46,7 +46,7 @@ class PopularTVBloc extends Bloc<PopularTVEvent, PopularTVState> {
     emit(PopularTVLoading());
     try {
       final totalPages = await fetchTotalPages();
-      final genreMap = await fetchTvShowGenreMap(); // You need to implement this use case
+      final genreMap = await fetchTvShowGenreMap(event.languageCode); // You need to implement this use case
       emit(PopularTVLoaded([], totalPages, genreMap)); // Empty list initially
     } catch (e) {
       emit(PopularTVError(e.toString()));

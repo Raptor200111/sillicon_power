@@ -5,5 +5,5 @@ class FetchTvShowGenreMap {
 
   const FetchTvShowGenreMap(this.repository);
 
-  Future<Map<int, String>> call() => repository.fetchTvShowGenreMap();
+  Future<Map<int, String>> call(String languageCode) => repository.fetchTvShowGenreMap(languageCode);
 }

@@ -8,8 +8,8 @@ class TVShowRepositoryImpl implements TVShowRepository {
   const TVShowRepositoryImpl(this.tmdbDatasource);
 
   @override
-  Future<List<TVShow>> fetchPopularTVShows(int page) async {
-    final models = await tmdbDatasource.fetchPopularTvShows(page);
+  Future<List<TVShow>> fetchPopularTVShows(int page, String languageCode) async {
+    final models = await tmdbDatasource.fetchPopularTvShows(page, languageCode);
     return models.map((model) => model.toEntity()).toList();
   }
 
@@ -17,6 +17,6 @@ class TVShowRepositoryImpl implements TVShowRepository {
   Future<int> fetchTotalPages() => tmdbDatasource.fetchTotalPages();
 
   @override
-  Future<Map<int, String>> fetchTvShowGenreMap() =>
-      tmdbDatasource.fetchTvShowGenreMap();
+  Future<Map<int, String>> fetchTvShowGenreMap(String languageCode) =>
+      tmdbDatasource.fetchTvShowGenreMap(languageCode);
 }

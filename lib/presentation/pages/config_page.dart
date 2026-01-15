@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sillicon_power/presentation/theme/language_provider.dart';
 import 'package:sillicon_power/presentation/theme/theme_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ConfigPage extends StatelessWidget {
   const ConfigPage({super.key});
@@ -19,35 +21,62 @@ class ConfigPage extends StatelessWidget {
             backgroundColor: Theme.of(context).colorScheme.background,
             pinned: true,
             title: Text(
-              'Configuration',
+              AppLocalizations.of(context)!.configuration,
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Theme Mode:',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  DropdownButton(
-                    value: context.watch<ThemeProvider>().themeMode,
-                    items: const [
-                      DropdownMenuItem(value: ThemeMode.dark, child: Text("DarkMode") ),
-                      DropdownMenuItem(value: ThemeMode.light, child: Text("LightMode") ),
-                      DropdownMenuItem(value: ThemeMode.system, child: Text("System") ),
-                    ], 
-                    onChanged: (ThemeMode? value) {
-                      if (value != null) {
-                        context.read<ThemeProvider>().setThemeMode(value);
-                      }
-                    }, 
-                  ),
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${AppLocalizations.of(context)!.themeMode}:',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    DropdownButton(
+                      value: context.watch<ThemeProvider>().themeMode,
+                      items: const [
+                        DropdownMenuItem(value: ThemeMode.dark, child: Text("Dark") ),
+                        DropdownMenuItem(value: ThemeMode.light, child: Text("Light") ),
+                        DropdownMenuItem(value: ThemeMode.system, child: Text("System") ),
+                      ], 
+                      onChanged: (ThemeMode? value) {
+                        if (value != null) {
+                          context.read<ThemeProvider>().setThemeMode(value);
+                        }
+                      }, 
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${AppLocalizations.of(context)!.language}:',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(width: 16),
+                        DropdownButton<Locale>(
+                          value: context.watch<LanguageProvider>().locale,
+                          items: const [
+                            DropdownMenuItem(value: Locale('en'), child: Text("English")),
+                            DropdownMenuItem(value: Locale('es'), child: Text("Español")),
+                          ],
+                          onChanged: (Locale? value) {
+                            if (value != null) {
+                              context.read<LanguageProvider>().setLanguage(value);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 ],
-              ),
+              )
             ),
           ),
           const SliverFillRemaining(
