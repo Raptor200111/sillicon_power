@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
 
     final languageCode = context.watch<LanguageProvider>().locale.languageCode;
 
-    // Only reload if language changed
+    // Only reload if language changed (or first load when _prevLanguage is null)
     if (_prevLanguage != languageCode) {
       _prevLanguage = languageCode;
       _currentPageIndex = 0;
