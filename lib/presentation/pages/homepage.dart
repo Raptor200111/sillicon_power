@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sillicon_power/presentation/pages/config_page.dart';
 import '../../core/di/service_locator.dart';
 import '../bloc/popular_tv/popular_tv_bloc.dart';
 import '../bloc/popular_tv/popular_tv_event.dart';
@@ -61,8 +62,10 @@ class _HomePageState extends State<HomePage> {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.more_horiz),
-                    onPressed: () => {},
-                    //onPressed: () => print('More options'), //ToDo: implement config_page
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ConfigPage()),
+                    ),
                   ),
                 ],
               ),
