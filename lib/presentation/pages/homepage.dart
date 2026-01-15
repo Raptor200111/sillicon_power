@@ -34,10 +34,6 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
 
     final languageCode = context.watch<LanguageProvider>().locale.languageCode;
-    final bloc = context.read<PopularTVBloc>();
-
-    bloc.add(LoadTvShowInfo(languageCode));
-    bloc.add(LoadPopularTVShows(1, languageCode));
 
     // Only reload if language changed
     if (_prevLanguage != languageCode) {
