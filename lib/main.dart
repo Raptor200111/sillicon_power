@@ -1,17 +1,20 @@
-import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+import 'package:sillicon_power/core/di/services/isar_service.dart';
 import 'package:sillicon_power/presentation/bloc/popular_tv/popular_tv_bloc.dart';
 import 'package:sillicon_power/presentation/theme/language_provider.dart';
 import 'package:sillicon_power/presentation/theme/theme.dart';
+import 'package:flutter/material.dart';
 import 'package:sillicon_power/presentation/theme/theme_provider.dart';
 import 'presentation/pages/homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/di/service_locator.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await IsarService().init();
+  
   await dotenv.load();
   setupDependencies();
   runApp(
@@ -38,22 +41,7 @@ class MyApp extends StatelessWidget {
       title: 'Sillicon Power Inc.',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: context.watch<ThemeProvider>().themeMode,
-
-      locale: context.watch<LanguageProvider>().locale,
-
-      supportedLocales: const [
-        Locale('en'),
-        Locale('es'),
-      ],
-
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ], 
-
+      themeMode: ThemeMode. system,
       home: const HomePage(title: 'Sillicon Power Inc.'),
     );
   }

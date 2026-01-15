@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:sillicon_power/presentation/pages/config_page.dart';
 import 'package:sillicon_power/presentation/theme/language_provider.dart';
-import '../../core/di/service_locator.dart';
 import '../bloc/popular_tv/popular_tv_bloc.dart';
 import '../bloc/popular_tv/popular_tv_event.dart';
 import '../bloc/popular_tv/popular_tv_state.dart';
@@ -33,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final languageCode = context.watch<LanguageProvider>().locale.languageCode;
+    final languageCode = context.watch<LanguageProvider>().currentLanguage;
 
     // Only reload if language changed
     if (_prevLanguage != languageCode) {
@@ -49,7 +47,7 @@ class _HomePageState extends State<HomePage> {
   void _goToPreviousPage(BuildContext context) {
     if (_currentPageIndex > 0) {
       _currentPageIndex--;
-      final languageCode = context.read<LanguageProvider>().locale.languageCode;
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
           .read<PopularTVBloc>()
           .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
@@ -59,7 +57,7 @@ class _HomePageState extends State<HomePage> {
   void _goToNextPage(BuildContext context, int totalPages) {
     if (_currentPageIndex < totalPages - 1) {
       _currentPageIndex++;
-      final languageCode = context.read<LanguageProvider>().locale.languageCode;
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
           .read<PopularTVBloc>()
           .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
