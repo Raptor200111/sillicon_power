@@ -1,25 +1,23 @@
 import '../entities/tv_show.dart';
 
 abstract class TVShowRepository {
-  /// Fetch from API, optionally save to cache
-  Future<List<TVShow>> fetchPopularTVShows(int page, String language);
+  Future<List<TVShow>> fetchPopularTVShows(int page, String languageCode);
+  Future<int> fetchTotalPages();
+  Future<Map<int, String>> fetchTvShowGenreMap(String languageCode);
   
-  /// Fetch and cache a page in BOTH languages simultaneously
-  Future<List<TVShow>> fetchPageInBothLanguages(int page, String currentLanguage);
+  /// Download all 500 pages for a specific language
+  Future<void> downloadAllPages(String language, Function(int, int) onProgress);
   
   /// Get cached page data
   Future<List<TVShow>?> getCachedPageData(int page, String language);
   
-  /// Save page data to cache
+  /// Cache page data
   Future<void> cachePageData(int page, String language, List<TVShow> tvShows);
   
-  /// Get the maximum cached page number for offline mode
-  Future<int> getMaxCachedPages(String language);
+  /// Check if all pages are downloaded
+  Future<bool> areAllPagesDownloaded(String language);
   
   /// Clear cache
   Future<void> clearCache(int page, String language);
   Future<void> clearAllCache();
-  
-  Future<int> fetchTotalPages();
-  Future<Map<int, String>> fetchTvShowGenreMap(String language);
 }

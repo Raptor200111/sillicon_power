@@ -17,7 +17,7 @@ class OfflineDatasource {
       pageNumber: pageNumber,
       language: language,
       tvShows: tvShows,
-      cachedAt: DateTime.now(),
+      cachedAt:  DateTime.now(),
     );
 
     await isar.writeTxn(() async {
@@ -46,11 +46,10 @@ class OfflineDatasource {
     return pages.length;
   }
 
-  /// Get the highest page number cached for a language
-  Future<int> getMaxCachedPageNumber(String language) async {
-    final pages = await getAllPages(language);
-    if (pages.isEmpty) return 0;
-    return pages.fold<int>(0, (max, page) => page.pageNumber > max ? page.pageNumber : max);
+  /// Check if all 500 pages are cached for a language
+  Future<bool> areAllPagesDownloaded(String language) async {
+    final count = await getCachedPageCount(language);
+    return count == 500;
   }
 
   /// Clear specific page cache for a language
@@ -69,7 +68,7 @@ class OfflineDatasource {
   }
 
   /// Check if page is cached and not too old
-  bool isPageCacheValid(TVShowPageModel?    pageData, {Duration? maxAge}) {
+  bool isPageCacheValid(TVShowPageModel?  pageData, {Duration? maxAge}) {
     if (pageData == null) return false;
     if (maxAge == null) return true;
     return DateTime.now().difference(pageData.cachedAt) < maxAge;

@@ -8,50 +8,42 @@ class TVShowRepositoryImpl implements TVShowRepository {
   final TmdbDatasource tmdbDatasource;
   final OfflineDatasource offlineDatasource;
 
-  const TVShowRepositoryImpl(
-    this.tmdbDatasource,
-    this. offlineDatasource,
-  );
+  const TVShowRepositoryImpl(this.tmdbDatasource, this.offlineDatasource);
 
   @override
-  Future<List<TVShow>> fetchPopularTVShows(int page, String language) async {
-    final models = await tmdbDatasource. fetchPopularTvShows(page, language);
-    final tvShows = models.map((model) => model.toEntity()).toList();
-    
-    // Automatically cache fresh data
-    await cachePageData(page, language, tvShows);
-    
-    return tvShows;
+  Future<List<TVShow>> fetchPopularTVShows(int page, String languageCode) async {
+    final models = await tmdbDatasource. fetchPopularTvShows(page, languageCode);
+    return models.map((model) => model.toEntity()).toList();
   }
 
-  /// Fetch and cache a page in BOTH languages simultaneously
-  Future<List<TVShow>> fetchPageInBothLanguages(int page, String currentLanguage) async {
-    try {
-      // Fetch current language first (show to user immediately)
-      final currentLangTvShows = await fetchPopularTVShows(page, currentLanguage);
-      
-      // Fetch other language in background
-      final otherLang = currentLanguage == 'en' ? 'es' : 'en';
-      _fetchAndCacheLanguageInBackground(page, otherLang);
-      
-      return currentLangTvShows;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  @override
+  Future<int> fetchTotalPages() => tmdbDatasource.fetchTotalPages();
 
-  /// Background fetch for the other language
-  // ignore:  unawaited_futures
-  void _fetchAndCacheLanguageInBackground(int page, String language) async {
-    try {
-      await fetchPopularTVShows(page, language);
-    } catch (e) {
-      print('Background fetch for $language failed: $e');
+  @override
+  Future<Map<int, String>> fetchTvShowGenreMap(String languageCode) =>
+      tmdbDatasource. fetchTvShowGenreMap(languageCode);
+
+  /// Download all 500 pages for a language with progress callback
+  @override
+  Future<void> downloadAllPages(
+    String language,
+    Function(int, int) onProgress,
+  ) async {
+    const totalPages = 500;
+
+    for (int page = 1; page <= totalPages; page++) {
+      try {
+        final tvShows = await fetchPopularTVShows(page, language);
+        await cachePageData(page, language, tvShows);
+        onProgress(page, totalPages);
+      } catch (e) {
+        // Continue downloading other pages on error
+      }
     }
   }
 
   @override
-  Future<List<TVShow>? > getCachedPageData(int page, String language) async {
+  Future<List<TVShow>?> getCachedPageData(int page, String language) async {
     final pageData = await offlineDatasource.getPageData(page, language);
     if (pageData == null) return null;
     return pageData.tvShows. map((model) => model.toEntity()).toList();
@@ -62,17 +54,17 @@ class TVShowRepositoryImpl implements TVShowRepository {
     final models = tvShows
         .map((tvShow) => TVShowModel. fromEntity(tvShow))
         .toList();
-    
+
     await offlineDatasource.savePageData(
-      pageNumber:  page,
+      pageNumber: page,
       language: language,
       tvShows: models,
     );
   }
 
-  /// Get the maximum cached page for offline mode
-  Future<int> getMaxCachedPages(String language) async {
-    return await offlineDatasource.getMaxCachedPageNumber(language);
+  @override
+  Future<bool> areAllPagesDownloaded(String language) async {
+    return await offlineDatasource.areAllPagesDownloaded(language);
   }
 
   @override
@@ -84,11 +76,4 @@ class TVShowRepositoryImpl implements TVShowRepository {
   Future<void> clearAllCache() async {
     await offlineDatasource.clearAllCache();
   }
-
-  @override
-  Future<int> fetchTotalPages() => tmdbDatasource.fetchTotalPages();
-
-  @override
-  Future<Map<int, String>> fetchTvShowGenreMap(String language) =>
-      tmdbDatasource.fetchTvShowGenreMap(language);
 }

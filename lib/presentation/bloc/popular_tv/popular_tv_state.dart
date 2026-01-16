@@ -10,72 +10,54 @@ abstract class PopularTVState extends Equatable {
 
 class PopularTVInitial extends PopularTVState {}
 
+class DownloadingPages extends PopularTVState {
+  final int downloadedPages;
+  final int totalPages;
+
+  const DownloadingPages(this.downloadedPages, this.totalPages);
+
+  @override
+  List<Object> get props => [downloadedPages, totalPages];
+}
+
 class PopularTVLoading extends PopularTVState {}
 
-/// NEW: Shows cached data while fetching fresh data
-class PopularTVLoadedFromCache extends PopularTVState {
+class PopularTVLoaded extends PopularTVState {
   final List<TVShow> tvShows;
   final int totalPages;
   final Map<int, String> genreMap;
-  final bool isRefreshing; // Indicates if background fetch is happening
+  final bool isRefreshing;
 
-  const PopularTVLoadedFromCache(
+  const PopularTVLoaded(
     this.tvShows,
     this.totalPages,
-    this.genreMap, 
-    {
-      this.isRefreshing = false,
-    }
-  );
+    this.genreMap, {
+    this.isRefreshing = false,
+  });
 
-  @override
-  List<Object> get props => [tvShows, totalPages, genreMap, isRefreshing];
-
-  /// Create copy with different values
-  PopularTVLoadedFromCache copyWith({
+  PopularTVLoaded copyWith({
     List<TVShow>? tvShows,
     int? totalPages,
     Map<int, String>? genreMap,
     bool? isRefreshing,
   }) {
-    return PopularTVLoadedFromCache(
+    return PopularTVLoaded(
       tvShows ?? this.tvShows,
       totalPages ?? this.totalPages,
       genreMap ?? this.genreMap,
       isRefreshing:  isRefreshing ?? this.isRefreshing,
     );
   }
-}
-
-class PopularTVLoaded extends PopularTVState {
-  final List<TVShow> tvShows;
-  final int totalPages;
-  final Map<int, String> genreMap;
-
-  const PopularTVLoaded(this.tvShows, this. totalPages, this.genreMap);
 
   @override
-  List<Object> get props => [tvShows, totalPages, genreMap];
+  List<Object> get props => [tvShows, totalPages, genreMap, isRefreshing];
 }
 
 class PopularTVError extends PopularTVState {
   final String message;
-  final List<TVShow>? cachedTvShows;
-  final int? totalPages;
-  final Map<int, String>? genreMap;
 
-  const PopularTVError(
-    this.message, {
-    this.cachedTvShows,
-    this.totalPages,
-    this.genreMap,
-  });
+  const PopularTVError(this.message);
 
   @override
-  List<Object> get props => [
-    message,
-    if (cachedTvShows != null) cachedTvShows!,
-    if (totalPages != null) totalPages!,
-    if (genreMap != null) genreMap!,
-  ];
+  List<Object> get props => [message];
 }
