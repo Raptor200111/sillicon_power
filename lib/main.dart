@@ -1,6 +1,5 @@
 
 import 'package:provider/provider.dart';
-import 'package:sillicon_power/core/di/services/isar_service.dart';
 import 'package:sillicon_power/presentation/bloc/popular_tv/popular_tv_bloc.dart';
 import 'package:sillicon_power/presentation/theme/language_provider.dart';
 import 'package:sillicon_power/presentation/theme/theme.dart';
@@ -13,11 +12,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await IsarService().init();
-  
   await dotenv.load();
-  setupDependencies();
+  await setupDependencies(); // ✅ Await this!
+  
   runApp(
     MultiProvider(
       providers: [
@@ -44,8 +41,7 @@ class MyApp extends StatelessWidget {
       title: 'Sillicon Power Inc.',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      // Add localization configuration
+      themeMode: context.watch<ThemeProvider>().themeMode,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: Locale(languageProvider.currentLanguage),

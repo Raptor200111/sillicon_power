@@ -10,7 +10,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -19,28 +18,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
-  String? _prevLanguage; // Track previous language to reload
-
-  @override
-  void initState() {
-    super.initState();
-    _currentPageIndex = 0;
-  }
+  String? _prevLanguage;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final languageCode = context.watch<LanguageProvider>().currentLanguage;
-
-    // Only reload if language changed
     if (_prevLanguage != languageCode) {
       _prevLanguage = languageCode;
-
-      // Dispatch BLoC events for new language
-      final bloc = context.read<PopularTVBloc>();
-      bloc.add(LoadTvShowInfo(languageCode));
-      bloc.add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
+      context.read<PopularTVBloc>()
+        ..add(LoadTvShowInfo(languageCode))
+        ..add(LoadPopularTVShowsWithCache(_currentPageIndex + 1, languageCode));
     }
   }
 
@@ -49,8 +37,8 @@ class _HomePageState extends State<HomePage> {
       _currentPageIndex--;
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
-          .read<PopularTVBloc>()
-          .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
+        .read<PopularTVBloc>()
+        .add(LoadPopularTVShowsWithCache(_currentPageIndex + 1, languageCode));
     }
   }
 
@@ -59,78 +47,91 @@ class _HomePageState extends State<HomePage> {
       _currentPageIndex++;
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
-          .read<PopularTVBloc>()
-          .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
+        .read<PopularTVBloc>()
+        .add(LoadPopularTVShowsWithCache(_currentPageIndex + 1, languageCode));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    //final languageCode = context.watch<LanguageProvider>().locale.languageCode;
     return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              floating: true,
-              expandedHeight: 0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(color: Theme.of(context).colorScheme.secondary),
-                title: Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true,
+            expandedHeight: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(color: Theme.of(context).colorScheme.secondary),
+              title: Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons. more_horiz),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ConfigPage())),
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.more_horiz),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ConfigPage()),
+            ],
+          ),
+          BlocBuilder<PopularTVBloc, PopularTVState>(
+            builder: (context, state) {
+              if (state is PopularTVLoading) {
+                return const SliverFillRemaining(hasScrollBody: false, child: Center(child: CircularProgressIndicator(color: Colors.black)));
+              }
+              if (state is PopularTVError) {
+                return SliverFillRemaining(hasScrollBody: false, child: Center(child: Text(AppLocalizations.of(context)! .error)));
+              }
+              if (state is PopularTVLoadedFromCache) {
+                final realTotalPages = state.totalPages > 500 ? 500 : state. totalPages;
+                return SliverToBoxAdapter(
+                  child:  Stack(
+                    children: [
+                      ListPageWidget(
+                        genres: state.genreMap,
+                        page: _currentPageIndex + 1,
+                        tvShows: state.tvShows,
+                        totalPages: realTotalPages,
+                        onPreviousPage: () => _goToPreviousPage(context),
+                        onNextPage: () => _goToNextPage(context, realTotalPages),
+                      ),
+                      if (state.isRefreshing)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            color: Colors.blue. withOpacity(0.3),
+                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment:  MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.blue))),
+                                const SizedBox(width: 8),
+                                Text(AppLocalizations.of(context)!.updating, style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.w500)),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            BlocBuilder<PopularTVBloc, PopularTVState>(
-              builder: (context, state) {
-                if (state is PopularTVLoading) {
-                  return const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: CircularProgressIndicator(color: Colors.black,),
-                    ),
-                  );
-                }
-
-                if (state is PopularTVError) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Text(AppLocalizations.of(context)!.error),
-                    ),
-                  );
-                }
-
-                if (state is PopularTVLoaded) {
-                  int realTotalPages = state.totalPages > 500 ? 500 : state.totalPages;
-
-                  return SliverToBoxAdapter(
-                    child: ListPageWidget(
-                      genres: state.genreMap,
-                      page: _currentPageIndex + 1,
-                      tvShows: state.tvShows,
-                      totalPages: realTotalPages,
-                      onPreviousPage: () => _goToPreviousPage(context),
-                      onNextPage: () =>
-                          _goToNextPage(context, realTotalPages),
-                    ),
-                  );
-                }
-
-                return const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(child: Text('No data')),
                 );
-              },
-            ),
-          ],
-        ),
-      );
+              }
+              if (state is PopularTVLoaded) {
+                final realTotalPages = state.totalPages > 500 ? 500 : state.totalPages;
+                return SliverToBoxAdapter(
+                  child: ListPageWidget(
+                    genres:  state.genreMap,
+                    page: _currentPageIndex + 1,
+                    tvShows: state.tvShows,
+                    totalPages: realTotalPages,
+                    onPreviousPage: () => _goToPreviousPage(context),
+                    onNextPage: () => _goToNextPage(context, realTotalPages),
+                  ),
+                );
+              }
+              return const SliverFillRemaining(hasScrollBody:  false, child: Center(child:  Text('No data')));
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

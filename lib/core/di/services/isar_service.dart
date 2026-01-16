@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sillicon_power/data/models/local_tv_show_model.dart';
+import 'package:sillicon_power/data/models/tv_show_page_model.dart';
 
 class IsarService {
   static final IsarService _instance = IsarService._internal();
@@ -18,8 +18,8 @@ class IsarService {
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
-      [LocalTVShowModelSchema],
-      directory: dir.path,
+      [TVShowPageModelSchema],
+      directory: dir. path,
     );
   }
   

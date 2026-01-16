@@ -1,102 +1,94 @@
-import 'package:sillicon_power/data/datasources/local_tv_show_datasource.dart';
-import '../../domain/entities/tv_show.dart';
-import '../../domain/repositories/tv_show_repository.dart';
-import '../datasources/tmdb_datasource.dart';
-import '../models/local_tv_show_model.dart';
+import 'package:sillicon_power/data/datasources/offline_datasource.dart';
+import 'package:sillicon_power/data/datasources/tmdb_datasource.dart';
+import 'package:sillicon_power/data/models/tv_show_page_model.dart';
+import 'package:sillicon_power/domain/entities/tv_show.dart';
+import 'package:sillicon_power/domain/repositories/tv_show_repository.dart';
 
 class TVShowRepositoryImpl implements TVShowRepository {
-  final TmdbTvShowDatasource tmdbDatasource;
-  final LocalTvShowDatasource localDatasource;
+  final TmdbDatasource tmdbDatasource;
+  final OfflineDatasource offlineDatasource;
 
   const TVShowRepositoryImpl(
     this.tmdbDatasource,
-    this.localDatasource,
+    this. offlineDatasource,
   );
-
-  /// Get the current language (you'll need to implement language provider)
-  /// For now, we'll default to 'en'.  Later you'll connect this to your language provider
-  String get _currentLanguage => 'en';
 
   @override
   Future<List<TVShow>> fetchPopularTVShows(int page, String language) async {
+    final models = await tmdbDatasource. fetchPopularTvShows(page, language);
+    final tvShows = models.map((model) => model.toEntity()).toList();
+    
+    // Automatically cache fresh data
+    await cachePageData(page, language, tvShows);
+    
+    return tvShows;
+  }
+
+  /// Fetch and cache a page in BOTH languages simultaneously
+  Future<List<TVShow>> fetchPageInBothLanguages(int page, String currentLanguage) async {
     try {
-      // Try to fetch from API first
-      final models = await tmdbDatasource. fetchPopularTvShows(page, language);
+      // Fetch current language first (show to user immediately)
+      final currentLangTvShows = await fetchPopularTVShows(page, currentLanguage);
       
-      // Convert to local models and save to database
-      final localModels = models
-          .map((model) => LocalTVShowModel.fromTmdbModel(
-                model,
-                language: _currentLanguage,
-                pageNumber: page,
-              ))
-          .toList();
+      // Fetch other language in background
+      final otherLang = currentLanguage == 'en' ? 'es' : 'en';
+      _fetchAndCacheLanguageInBackground(page, otherLang);
       
-      // Save to local database for offline access
-      await localDatasource. saveTVShowsForLanguage(
-        localModels,
-        _currentLanguage,
-        page,
-      );
-      
-      // Return the data (converted to entities)
-      return localModels. map((model) => model.toEntity()).toList();
+      return currentLangTvShows;
     } catch (e) {
-      // If API fails, try to get from local database
-      final localModels = await localDatasource.getTVShowsForLanguage(
-        _currentLanguage,
-        page,
-      );
-      
-      if (localModels.isNotEmpty) {
-        // Return cached data
-        return localModels.map((model) => model.toEntity()).toList();
-      }
-      
-      // No local data available, re-throw the error
       rethrow;
     }
   }
 
-  @override
-  Future<int> fetchTotalPages() async {
+  /// Background fetch for the other language
+  // ignore:  unawaited_futures
+  void _fetchAndCacheLanguageInBackground(int page, String language) async {
     try {
-      return await tmdbDatasource.fetchTotalPages();
+      await fetchPopularTVShows(page, language);
     } catch (e) {
-      // If API fails, return a default value
-      // In a real app, you might cache this too
-      return 1;
+      print('Background fetch for $language failed: $e');
     }
   }
 
   @override
-  Future<Map<int, String>> fetchTvShowGenreMap(String language) async {
-    try {
-      return await tmdbDatasource.fetchTvShowGenreMap(language);
-    } catch (e) {
-      // If API fails, return empty map
-      // In a real app, you might cache this too
-      return {};
-    }
+  Future<List<TVShow>? > getCachedPageData(int page, String language) async {
+    final pageData = await offlineDatasource.getPageData(page, language);
+    if (pageData == null) return null;
+    return pageData.tvShows. map((model) => model.toEntity()).toList();
   }
-  
-  /// Clear all cached data for current language
-  Future<void> clearCacheForCurrentLanguage() async {
-    await localDatasource.clearTVShowsForLanguage(_currentLanguage);
+
+  @override
+  Future<void> cachePageData(int page, String language, List<TVShow> tvShows) async {
+    final models = tvShows
+        .map((tvShow) => TVShowModel. fromEntity(tvShow))
+        .toList();
+    
+    await offlineDatasource.savePageData(
+      pageNumber:  page,
+      language: language,
+      tvShows: models,
+    );
   }
-  
-  /// Clear all cached data
+
+  /// Get the maximum cached page for offline mode
+  Future<int> getMaxCachedPages(String language) async {
+    return await offlineDatasource.getMaxCachedPageNumber(language);
+  }
+
+  @override
+  Future<void> clearCache(int page, String language) async {
+    await offlineDatasource. clearPageCache(page, language);
+  }
+
+  @override
   Future<void> clearAllCache() async {
-    await localDatasource.clearAllData();
+    await offlineDatasource.clearAllCache();
   }
-  
-  /// Check if we have cached data for the current page
-  Future<bool> hasCachedPage(int page) async {
-    return await localDatasource.hasPageDataForLanguage(_currentLanguage, page);
-  }
-  
-  /// Check if we have any cached data for current language
-  Future<bool> hasCachedData() async {
-    return await localDatasource.hasDataForLanguage(_currentLanguage);
-  }
+
+  @override
+  Future<int> fetchTotalPages() => tmdbDatasource.fetchTotalPages();
+
+  @override
+  Future<Map<int, String>> fetchTvShowGenreMap(String language) =>
+      tmdbDatasource.fetchTvShowGenreMap(language);
 }

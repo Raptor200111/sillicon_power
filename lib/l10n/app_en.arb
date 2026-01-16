@@ -13,5 +13,6 @@
   "vote": "vote",
   "votes": "votes",
   "page": "Page",
-  "pageOf": "of"
+  "pageOf": "of",
+  "updating": "Updating with latest data..."
 }

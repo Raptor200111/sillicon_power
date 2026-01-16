@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/tmdb_tv_show_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class TmdbTvShowDatasource {
+class TmdbDatasource {
   static String get tmdbApiKey {
     final key = dotenv.env['TMDB_API_KEY'];
     if (key == null || key.isEmpty) {

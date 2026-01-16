@@ -1,49 +1,48 @@
 import 'package:get_it/get_it.dart';
-import 'package:sillicon_power/core/di/services/isar_service.dart';
+import 'package:isar/isar.dart';
+import 'package:sillicon_power/data/datasources/offline_datasource.dart';
 import 'package:sillicon_power/data/datasources/tmdb_datasource.dart';
-import 'package:sillicon_power/presentation/theme/language_provider.dart';
-import '../../data/datasources/local_tv_show_datasource.dart';
-import '../../data/repositories/tv_show_repository_impl.dart';
-import '../../domain/repositories/tv_show_repository.dart';
-import '../../domain/usecases/fetch_popular_tv_shows.dart';
-import '../../domain/usecases/fetch_total_pages.dart';
-import '../../domain/usecases/fetch_tv_show_genre_map.dart';
-import '../../presentation/bloc/popular_tv/popular_tv_bloc.dart';
+import 'package:sillicon_power/data/repositories/tv_show_repository_impl.dart';
+import 'package:sillicon_power/domain/repositories/tv_show_repository.dart';
+import 'package:sillicon_power/domain/usecases/fetch_popular_tv_shows.dart';
+import 'package:sillicon_power/domain/usecases/fetch_total_pages.dart';
+import 'package:sillicon_power/domain/usecases/fetch_tv_show_genre_map.dart';
+import 'package:sillicon_power/presentation/bloc/popular_tv/popular_tv_bloc.dart';
+import 'services/isar_service.dart';
 
 final getIt = GetIt.instance;
 
-void setupDependencies() {
-  // Services
-  getIt.registerLazySingleton<IsarService>(() => IsarService());
-
-  // Providers
-  getIt.registerLazySingleton<LanguageProvider>(() => LanguageProvider());
+Future<void> setupDependencies() async {
+  // Initialize Isar Service (singleton)
+  final isarService = IsarService();
+  await isarService.init();
+  getIt.registerSingleton<IsarService>(isarService);
+  getIt.registerSingleton<Isar>(isarService.isar);
 
   // Datasources
-  getIt.registerLazySingleton<TmdbTvShowDatasource>(() => TmdbTvShowDatasource());
-  getIt.registerLazySingleton<LocalTvShowDatasource>(
-    () => LocalTvShowDatasource(getIt<IsarService>()),
+  getIt. registerLazySingleton<TmdbDatasource>(() => TmdbDatasource());
+  getIt.registerLazySingleton<OfflineDatasource>(
+    () => OfflineDatasource(getIt<Isar>()),
   );
 
   // Repositories
   getIt.registerLazySingleton<TVShowRepository>(
     () => TVShowRepositoryImpl(
-      getIt<TmdbTvShowDatasource>(),
-      getIt<LocalTvShowDatasource>(),
+      getIt<TmdbDatasource>(),
+      getIt<OfflineDatasource>(),
     ),
   );
 
   // Usecases
-  getIt.registerLazySingleton(() => FetchPopularTVShows(getIt<TVShowRepository>()));
+  getIt. registerLazySingleton(() => FetchPopularTVShows(getIt<TVShowRepository>()));
   getIt.registerLazySingleton(() => FetchTotalPages(getIt<TVShowRepository>()));
   getIt.registerLazySingleton(() => FetchTvShowGenreMap(getIt<TVShowRepository>()));
 
   // BLoCs
-  getIt.registerLazySingleton(
-    () => PopularTVBloc(
-      fetchPopularTVShows: getIt<FetchPopularTVShows>(),
-      fetchTotalPages: getIt<FetchTotalPages>(),
-      fetchTvShowGenreMap:  getIt<FetchTvShowGenreMap>(),
-    ),
-  );
+  getIt.registerFactory(() => PopularTVBloc(
+        fetchPopularTVShows: getIt<FetchPopularTVShows>(),
+        fetchTotalPages: getIt<FetchTotalPages>(),
+        fetchTvShowGenreMap: getIt<FetchTvShowGenreMap>(),
+        repository: getIt<TVShowRepository>(),
+      ));
 }

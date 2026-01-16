@@ -39,7 +39,7 @@ class ListPageWidget extends StatelessWidget {
               );
             },
           );
-        }).toList(),
+        }),
         // Page controller at the end
         Padding(
           padding: const EdgeInsets.all(16.0),
