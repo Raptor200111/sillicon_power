@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sillicon_power/domain/entities/tv_show.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GenreGridWidget extends StatelessWidget {
   final TVShow tvShow;
   final Map<int, String> genres;
 
-  const GenreGridWidget({Key? key, required this.tvShow, required this.genres}) : super(key: key);
+  const GenreGridWidget({super.key, required this.tvShow, required this.genres});
   
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class GenreGridWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              genres[genre] ?? 'Unknown',
+              genres[genre] ?? AppLocalizations.of(context)!.unknown,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),

@@ -12,12 +12,17 @@ class TmdbDatasource {
     return key;
   }
 
-  String tmdbPopularTVurl(int page) {
-    return 'https://api.themoviedb.org/3/tv/popular?page=$page&api_key=$tmdbApiKey';
+  String tmdbPopularTVurl(int page, String languageCode) {
+    return 'https://api.themoviedb.org/3/tv/popular?page=$page&language=$languageCode&api_key=$tmdbApiKey';
   }
 
-  Future<List<TmdbTVShowModel>> fetchPopularTvShows(int page) async {
-    final response = await http.get(Uri.parse(tmdbPopularTVurl(page)));
+  String tmdbGenreTVurl(String languageCode) {
+    return 'https://api.themoviedb.org/3/genre/tv/list?language=$languageCode&api_key=$tmdbApiKey';
+  }
+
+
+  Future<List<TmdbTVShowModel>> fetchPopularTvShows(int page, String languageCode) async {
+    final response = await http.get(Uri.parse(tmdbPopularTVurl(page, languageCode)));
 
     if (response.statusCode == 200) {
       final decoded = json.decode(response.body);
@@ -30,7 +35,7 @@ class TmdbDatasource {
   }
 
   Future<int> fetchTotalPages() async {
-    final response = await http.get(Uri.parse(tmdbPopularTVurl(1)));
+    final response = await http.get(Uri.parse(tmdbPopularTVurl(1, 'en')));
 
     if (response.statusCode == 200) {
       final decoded = json.decode(response.body);
@@ -40,9 +45,8 @@ class TmdbDatasource {
     }
   }
 
-  Future<Map<int, String>> fetchTvShowGenreMap() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/genre/tv/list?api_key=$tmdbApiKey'));
+  Future<Map<int, String>> fetchTvShowGenreMap(String languageCode) async {
+    final response = await http.get(Uri.parse(tmdbGenreTVurl(languageCode)));
 
     if (response.statusCode == 200) {
       final decoded = json.decode(response.body);

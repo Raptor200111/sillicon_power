@@ -6,5 +6,5 @@ class FetchPopularTVShows {
 
   const FetchPopularTVShows(this.repository);
 
-  Future<List<TVShow>> call(int page) => repository.fetchPopularTVShows(page);
+  Future<List<TVShow>> call(int page, String languageCode) => repository.fetchPopularTVShows(page, languageCode);
 }

@@ -1,0 +1,19 @@
+{
+  "appTitle": "Sillicon Power Inc.",
+  "configuration": "Configuration",
+  "themeMode": "Theme Mode",
+  "language": "Language",
+  "error": "Something went wrong...",
+  "popularity": "Popularity",
+  "firstAirDate": "First Air Date",
+  "originCountry": "Origin Country",
+  "originalLanguage": "Original Language",
+  "originalName": "Original Name",
+  "unknown": "Unknown",
+  "vote": "vote",
+  "votes": "votes",
+  "page": "Page",
+  "pageOf": "of",
+  "updating": "Updating with latest data...",
+  "dowloading": "Dowloading pages..."
+}

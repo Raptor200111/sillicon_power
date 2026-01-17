@@ -70,6 +70,7 @@ analysis_benchmark.json
 **/doc/api/
 .dart_tool/
 .flutter-plugins-dependencies
+.flutter-plugins
 **/generated_plugin_registrant.dart
 .packages
 .pub-preload-cache/
@@ -164,3 +165,4 @@ app.*.symbols
 .python-version
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
+.flutter-plugins

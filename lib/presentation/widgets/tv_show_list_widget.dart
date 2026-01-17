@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/tv_show.dart';
 import '../pages/tv_show_page.dart';
 import 'tv_show_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ListPageWidget extends StatelessWidget {
   final int page;
@@ -38,7 +39,7 @@ class ListPageWidget extends StatelessWidget {
               );
             },
           );
-        }).toList(),
+        }),
         // Page controller at the end
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -50,7 +51,7 @@ class ListPageWidget extends StatelessWidget {
                 child: Text('<', style: Theme.of(context).textTheme.titleLarge),
               ),
               const SizedBox(width: 16),
-              Text('Page $page of ${totalPages > 500 ? '500' : '$totalPages'}', style: Theme.of(context).textTheme.bodyMedium),
+              Text('${AppLocalizations.of(context)!.page} $page ${AppLocalizations.of(context)!.pageOf} ${totalPages > 500 ? '500' : '$totalPages'}', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(width: 16),
               ElevatedButton(
                 onPressed: onNextPage,
