@@ -14,5 +14,6 @@
   "votes": "votes",
   "page": "Page",
   "pageOf": "of",
-  "updating": "Updating with latest data..."
+  "updating": "Updating with latest data...",
+  "dowloading": "Dowloading pages..."
 }

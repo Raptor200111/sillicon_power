@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sillicon_power/presentation/pages/config_page.dart';
+import 'package:sillicon_power/presentation/theme/language_provider.dart';
 import '../bloc/popular_tv/popular_tv_bloc.dart';
 import '../bloc/popular_tv/popular_tv_event.dart';
 import '../bloc/popular_tv/popular_tv_state.dart';
@@ -20,11 +21,38 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
   late ScrollController _scrollController;
+  late PopularTVBloc _bloc;
+  String?  _prevLanguage;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _bloc = getIt<PopularTVBloc>();
+    
+    // Initialize with English on first load
+    final initialLanguage = context.read<LanguageProvider>().currentLanguage;
+    _prevLanguage = initialLanguage;
+    _bloc.add(LoadTvShowInfo(initialLanguage));
+    _bloc.add(LoadPopularTVShows(1, initialLanguage));
+    _bloc.add(const DownloadAllPages());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final languageCode = context. watch<LanguageProvider>().currentLanguage;
+
+    // Only reload if language changed
+    if (_prevLanguage != languageCode) {
+      _prevLanguage = languageCode;
+      _currentPageIndex = 0;
+
+      // Dispatch BLoC events for new language
+      _bloc.add(LoadTvShowInfo(languageCode));
+      _bloc.add(LoadPopularTVShows(1, languageCode));
+    }
   }
 
   @override
@@ -36,9 +64,10 @@ class _HomePageState extends State<HomePage> {
   void _goToPreviousPage(BuildContext context) {
     if (_currentPageIndex > 0) {
       _currentPageIndex--;
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
           .read<PopularTVBloc>()
-          .add(LoadPageWithBackground(_currentPageIndex + 1));
+          .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
       _scrollToTop();
     }
   }
@@ -46,9 +75,10 @@ class _HomePageState extends State<HomePage> {
   void _goToNextPage(BuildContext context, int totalPages) {
     if (_currentPageIndex < totalPages - 1) {
       _currentPageIndex++;
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
       context
           .read<PopularTVBloc>()
-          .add(LoadPageWithBackground(_currentPageIndex + 1));
+          .add(LoadPopularTVShows(_currentPageIndex + 1, languageCode));
       _scrollToTop();
     }
   }
@@ -67,10 +97,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<PopularTVBloc>()
-        ..add(const LoadTvShowInfo())
-        ..add(const DownloadAllPages()),
+    return BlocProvider. value(
+      value: _bloc,
       child: Scaffold(
         body: CustomScrollView(
           controller: _scrollController,
@@ -97,33 +125,10 @@ class _HomePageState extends State<HomePage> {
             ),
             BlocBuilder<PopularTVBloc, PopularTVState>(
               builder: (context, state) {
-                if (state is DownloadingPages) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child:  Center(
-                      child: Column(
-                        mainAxisAlignment:  MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            value: state.downloadedPages / state.totalPages,
-                            color: Colors.black,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Downloading pages...\n${state.downloadedPages}/${state. totalPages}',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
                 if (state is PopularTVLoading) {
                   return const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
+                    child:  Center(
                       child: CircularProgressIndicator(color: Colors.black),
                     ),
                   );
@@ -133,78 +138,27 @@ class _HomePageState extends State<HomePage> {
                   return SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Something went wrong',
-                            style:  Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            state.message,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
+                      child: Text(AppLocalizations.of(context)!.error),
                     ),
                   );
                 }
 
                 if (state is PopularTVLoaded) {
+                  int realTotalPages = state.totalPages > 500 ? 500 : state. totalPages;
                   return SliverToBoxAdapter(
-                    child: Stack(
-                      children: [
-                        ListPageWidget(
-                          genres: state.genreMap,
-                          page: _currentPageIndex + 1,
-                          tvShows: state.tvShows,
-                          totalPages:  500,
-                          onPreviousPage: () => _goToPreviousPage(context),
-                          onNextPage: () => _goToNextPage(context, 500),
-                        ),
-                        if (state.isRefreshing)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              color: Colors.blue. withOpacity(0.3),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment:  MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation(
-                                          Colors.blue),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)?.updating ??
-                                        'Updating...',
-                                    style: const TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
+                    child:  ListPageWidget(
+                      genres: state.genreMap,
+                      page: _currentPageIndex + 1,
+                      tvShows: state.tvShows,
+                      totalPages: realTotalPages,
+                      onPreviousPage: () => _goToPreviousPage(context),
+                      onNextPage: () => _goToNextPage(context, realTotalPages),
                     ),
                   );
                 }
 
                 return const SliverFillRemaining(
-                  hasScrollBody:  false,
+                  hasScrollBody: false,
                   child: Center(child: Text('No data')),
                 );
               },
