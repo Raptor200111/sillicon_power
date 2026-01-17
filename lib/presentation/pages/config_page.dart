@@ -59,13 +59,13 @@ class ConfigPage extends StatelessWidget {
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         const SizedBox(width: 16),
-                        DropdownButton<Locale>(
-                          value: context.watch<LanguageProvider>().locale,
+                        DropdownButton<String>(
+                          value: context.watch<LanguageProvider>().currentLanguage,
                           items: const [
-                            DropdownMenuItem(value: Locale('en'), child: Text("English")),
-                            DropdownMenuItem(value: Locale('es'), child: Text("Español")),
+                            DropdownMenuItem(value: 'en', child: Text("English")),
+                            DropdownMenuItem(value: 'es', child: Text("Español")),
                           ],
-                          onChanged: (Locale? value) {
+                          onChanged: (String? value) {
                             if (value != null) {
                               context.read<LanguageProvider>().setLanguage(value);
                             }

@@ -9,15 +9,23 @@ abstract class PopularTVEvent extends Equatable {
 
 class LoadPopularTVShows extends PopularTVEvent {
   final int page;
-  final String languageCode;
+  final String language;
 
-  const LoadPopularTVShows(this.page, this.languageCode);
+  const LoadPopularTVShows(this.page, this.language);
 
   @override
-  List<Object> get props => [page, languageCode];
+  List<Object> get props => [page, language];
 }
 
 class LoadTvShowInfo extends PopularTVEvent {
-  final String languageCode;
-  const LoadTvShowInfo(this.languageCode);
+  final String language;
+  
+  const LoadTvShowInfo(this.language);
+  
+  @override
+  List<Object> get props => [language];
+}
+
+class DownloadAllPages extends PopularTVEvent {
+  const DownloadAllPages();
 }

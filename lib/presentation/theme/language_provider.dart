@@ -1,30 +1,24 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
-class LanguageProvider with ChangeNotifier {
-  Locale _locale = const Locale('en');
-
-  Locale get locale => _locale;
-
-  LanguageProvider() {
-    loadLanguage();
-  }
-
-  void setLanguage(Locale locale) async {
-    _locale = locale;
-    notifyListeners();
-
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('language', locale.languageCode);
-  }
-
-  void loadLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString('language');
-
-    if (code != null) {
-      _locale = Locale(code);
+class LanguageProvider extends ChangeNotifier {
+  String _currentLanguage = 'en';
+  
+  String get currentLanguage => _currentLanguage;
+  
+  /// Change the language and notify listeners
+  void setLanguage(String language) {
+    if (_currentLanguage != language) {
+      _currentLanguage = language;
       notifyListeners();
     }
   }
+  
+  /// Get the language code (e.g., 'en', 'es')
+  String getLanguageCode() => _currentLanguage;
+  
+  /// Check if Spanish is selected
+  bool get isSpanish => _currentLanguage == 'es';
+  
+  /// Check if English is selected
+  bool get isEnglish => _currentLanguage == 'en';
 }
